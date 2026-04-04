@@ -3,10 +3,7 @@
   "name": "Dugout",
   "version": "1.0.0",
   "description": "Live discussion room for Hotstar IPL matches",
-  "permissions": [
-    "activeTab",
-    "storage"
-  ],
+  "permissions": ["activeTab", "storage"],
   "action": {
     "default_popup": "popup/popup.html",
     "default_title": "Dugout"
@@ -19,5 +16,8 @@
     "128": "icons/icon128.png",
     "256": "icons/icon256.png",
     "512": "icons/icon512.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src ws://localhost:3000 http://localhost:3000 ws://192.168.132.222:3000 http://192.168.132.222:3000"
   }
 }

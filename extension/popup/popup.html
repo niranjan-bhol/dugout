@@ -6,47 +6,84 @@
 </head>
 <body>
   <div class="container">
+    
+    <!-- Main View: Create or Join -->
     <div class="view" id="mainView">
       <p class="tagline">Create or join a <strong>dugout</strong> to discuss IPL matches live!</p>
-
       <div class="status">
         <span class="status-dot"></span>
         <span id="statusText">Ready</span>
       </div>
-
       <div class="button-group">
         <button class="btn-primary" id="createRoomBtn">Create</button>
         <button class="btn-secondary" id="joinRoomBtn">Join</button>
       </div>
     </div>
 
+    <!-- Name Input View -->
+    <div class="view hidden" id="nameView">
+      <p class="tagline">Enter your name</p>
+      <input type="text" id="nameInput" class="room-input" placeholder="Your name" autocomplete="off" maxlength="15">
+      <p class="error-message hidden" id="nameErrorMessage"></p>
+      <div class="button-group name-actions">
+        <button class="btn-secondary" id="backFromNameBtn">Back</button>
+        <button class="btn-primary" id="confirmNameBtn">Continue</button>
+      </div>
+    </div>
+
+    <!-- Create View: Show Room Code -->
     <div class="view hidden" id="createView">
       <p class="tagline">Your dugout code</p>
       <div class="room-code" id="generatedRoomId"></div>
       <p class="limit-message hidden" id="createLimitMessage"></p>
       <div class="button-group create-actions">
         <button class="btn-secondary" id="copyRoomBtn">Copy</button>
-        <button class="btn-primary" id="backFromCreateBtn">Back</button>
+        <button class="btn-primary" id="startVoiceFromCreateBtn">Enter</button>
+      </div>
+      <button class="btn-back" id="backFromCreateBtn">← Back</button>
+    </div>
+
+    <!-- Join View: Enter Room Code -->
+    <div class="view hidden" id="joinView">
+      <p class="tagline">Enter dugout code</p>
+      <input type="text" id="joinRoomInput" class="room-input" placeholder="word-word-word" autocomplete="off" spellcheck="false">
+      <p class="error-message hidden" id="joinErrorMessage"></p>
+      <div class="button-group join-actions">
+        <button class="btn-secondary" id="backFromJoinBtn">Back</button>
+        <button class="btn-primary" id="confirmJoinBtn">Continue</button>
       </div>
     </div>
 
-    <div class="view hidden" id="joinView">
-      <p class="tagline">Enter dugout code</p>
-      <input
-        type="text"
-        id="joinRoomInput"
-        class="room-input"
-        placeholder="word-word-word"
-        autocomplete="off"
-        spellcheck="false"
-      >
-      <div class="button-group join-actions">
-        <button class="btn-secondary" id="backFromJoinBtn">Back</button>
-        <button class="btn-primary" id="confirmJoinBtn">Join</button>
+    <!-- Voice Room View -->
+    <div class="view hidden" id="voiceView">
+      <p class="tagline">sledging in <strong id="voiceRoomCode"></strong></p>
+      <div class="voice-status" id="voiceStatusBox">
+        <span class="voice-dot" id="voiceDot"></span>
+        <span id="voiceStatusText">Connecting...</span>
+      </div>
+      <div class="peers-list" id="peersList"></div>
+      <div class="voice-controls">
+        <button class="btn-mic" id="muteBtn">Mute</button>
+        <button class="btn-leave" id="leaveVoiceBtn">Leave</button>
+      </div>
+      <div class="leave-confirmation hidden" id="leaveConfirmation">
+        <span class="confirmation-text">are you sure?</span>
+        <button class="btn-confirm-yes" id="confirmLeaveYes">Yes</button>
+        <button class="btn-confirm-no" id="confirmLeaveNo">No</button>
+      </div>
+      <div class="mic-help hidden" id="micHelp">
+        <button class="btn-enable-mic" id="enableMicBtn">Enable Microphone</button>
+        <p class="mic-help-message">Redirect to permissions page - set microphone to <strong>Allow</strong>.</p>
       </div>
     </div>
   </div>
+
+  <!-- Hidden audio container for remote streams -->
+  <div id="audioContainer" style="display:none;"></div>
   
+  <!-- External libraries -->
+  <script src="../lib/socket.io.min.js"></script>
+  <script src="../lib/simple-peer.min.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

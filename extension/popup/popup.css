@@ -1,7 +1,17 @@
+/**
+ * DUGOUT - Extension Popup Styles
+ * 
+ * Supports light/dark mode via prefers-color-scheme
+ * Uses Inter font family
+ */
+
+/* ===================
+   FONTS
+   =================== */
+
 @font-face {
   font-family: "Inter";
   src: url("../fonts/Inter-Regular.woff2") format("woff2");
-  font-style: normal;
   font-weight: 400;
   font-display: swap;
 }
@@ -9,7 +19,6 @@
 @font-face {
   font-family: "Inter";
   src: url("../fonts/Inter-Medium.woff2") format("woff2");
-  font-style: normal;
   font-weight: 500;
   font-display: swap;
 }
@@ -17,61 +26,62 @@
 @font-face {
   font-family: "Inter";
   src: url("../fonts/Inter-Bold.woff2") format("woff2");
-  font-style: normal;
   font-weight: 700;
   font-display: swap;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html,
-body,
-button,
-input {
-  font-family: "Inter", sans-serif;
-}
+/* ===================
+   CSS VARIABLES
+   =================== */
 
 :root {
-  --bg-color: #ffffff;
-  --text-color: #1c1c1c;
-  --muted-text-color: #707070;
-  --dugout-color: #057e70;
+  --bg: #ffffff;
+  --text: #1c1c1c;
+  --muted: #707070;
+  --accent: #057e70;
   --btn-bg: #71E2D4;
   --btn-text: #1c1c1c;
   --input-bg: rgba(0, 0, 0, 0.05);
   --input-border: rgba(0, 0, 0, 0.2);
-  --placeholder-color: rgba(0, 0, 0, 0.4);
+  --placeholder: rgba(0, 0, 0, 0.4);
   --status-bg: rgba(0, 0, 0, 0.05);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-color: #1c1c1c;
-    --text-color: #fcfcfc;
-    --muted-text-color: #bcbcbc;
-    --dugout-color: #2BC8B6;
-    --btn-bg: #71E2D4;
-    --btn-text: #1c1c1c;
+    --bg: #1c1c1c;
+    --text: #fcfcfc;
+    --muted: #bcbcbc;
+    --accent: #2BC8B6;
     --input-bg: rgba(255, 255, 255, 0.1);
     --input-border: rgba(255, 255, 255, 0.2);
-    --placeholder-color: rgba(255, 255, 255, 0.5);
+    --placeholder: rgba(255, 255, 255, 0.5);
     --status-bg: rgba(255, 255, 255, 0.05);
   }
 }
 
-body {
-  width: 320px;
-  background: var(--bg-color);
-  color: var(--text-color);
+/* ===================
+   BASE STYLES
+   =================== */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body, button, input {
+  font-family: "Inter", sans-serif;
 }
 
-.container {
-  padding: 16px;
+body {
+  width: 320px;
+  background: var(--bg);
+  color: var(--text);
 }
+
+.container { padding: 16px; }
+.hidden { display: none !important; }
+
+/* ===================
+   TYPOGRAPHY
+   =================== */
 
 .tagline {
   text-align: center;
@@ -83,8 +93,12 @@ body {
 
 .tagline strong {
   font-weight: 700;
-  color: var(--dugout-color);
+  color: var(--accent);
 }
+
+/* ===================
+   STATUS INDICATOR
+   =================== */
 
 .status {
   display: flex;
@@ -104,7 +118,11 @@ body {
   border-radius: 50%;
 }
 
-.btn-primary {
+/* ===================
+   BUTTONS
+   =================== */
+
+.btn-primary, .btn-secondary {
   width: 100%;
   padding: 11px;
   background: var(--btn-bg);
@@ -116,9 +134,42 @@ body {
   cursor: pointer;
 }
 
-.hidden {
-  display: none !important;
+.btn-back {
+  width: 100%;
+  margin-top: 12px;
+  padding: 8px;
+  background: transparent;
+  color: var(--muted);
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
 }
+
+.button-group {
+  display: flex;
+  gap: 8px;
+}
+
+.button-group .btn-primary,
+.button-group .btn-secondary { flex: 1; }
+
+/* ===================
+   INPUTS
+   =================== */
+
+.room-input {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text);
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 10px;
+  outline: none;
+}
+
+.room-input::placeholder { color: var(--placeholder); }
 
 .room-code {
   width: 100%;
@@ -132,51 +183,93 @@ body {
   word-break: break-word;
 }
 
-.room-input {
-  width: 100%;
-  padding: 11px;
-  border: 1px solid var(--input-border);
-  background: var(--input-bg);
-  color: var(--text-color);
-  border-radius: 6px;
-  font-size: 13px;
-  margin-bottom: 10px;
-  outline: none;
-}
-
-.room-input::placeholder {
-  color: var(--placeholder-color);
-}
-
-.join-actions {
-  margin-top: 12px;
-}
-
-.create-actions {
-  margin-top: 12px;
-}
+/* ===================
+   MESSAGES
+   =================== */
 
 .limit-message {
   margin-top: -2px;
   margin-bottom: 10px;
   font-size: 12px;
   line-height: 1.4;
-  color: var(--muted-text-color);
+  color: var(--muted);
 }
 
-.button-group {
+.error-message {
+  margin-top: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #ff4444;
+  text-align: center;
+}
+
+/* ===================
+   VOICE CHAT
+   =================== */
+
+.voice-status {
   display: flex;
+  align-items: center;
   gap: 8px;
+  padding: 10px;
+  background: var(--status-bg);
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 13px;
 }
 
-.button-group .btn-primary,
-.button-group .btn-secondary {
+.voice-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f59e0b;
+  animation: pulse 1.5s infinite;
+}
+
+.voice-dot.connected { background: #10b981; animation: none; }
+.voice-dot.error { background: #ef4444; animation: none; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Peers List */
+.peers-list {
+  margin-bottom: 12px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.peer-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--status-bg);
+  border-radius: 6px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.peer-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.peer-you {
+  font-weight: 500;
+  color: var(--accent);
+}
+
+/* Voice Controls */
+.voice-controls { display: flex; gap: 8px; }
+
+.btn-mic {
   flex: 1;
-  margin-top: 0;
-}
-
-.btn-secondary {
-  width: 100%;
   padding: 11px;
   background: var(--btn-bg);
   color: var(--btn-text);
@@ -186,3 +279,74 @@ body {
   font-weight: 500;
   cursor: pointer;
 }
+
+.btn-mic.muted {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+.btn-leave {
+  flex: 1;
+  padding: 11px;
+  background: #fecaca;
+  color: #991b1b;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Leave Confirmation */
+.leave-confirmation {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: var(--status-bg);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.confirmation-text {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.btn-confirm-yes, .btn-confirm-no {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-confirm-yes { background: #fecaca; color: #991b1b; }
+.btn-confirm-no { background: var(--btn-bg); color: var(--btn-text); }
+
+/* Mic Help */
+.mic-help { margin-top: 12px; }
+
+.btn-enable-mic {
+  width: 100%;
+  padding: 11px;
+  background: #fef3c7;
+  color: #92400e;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.mic-help-message {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Action margins */
+.join-actions, .create-actions, .name-actions { margin-top: 12px; }
