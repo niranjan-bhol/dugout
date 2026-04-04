@@ -1,0 +1,24 @@
+light
+background                         #FFFFFF
+button colour                      #057E70
+button colour after hover          #016B5E
+button text                        #FFFFFF
+banner backgorund                  #E9FBF9
+banner border                      #71E2D4
+banner text                        #057E70
+text                               #1F1F1F
+grey text                          #707070
+
+dark 
+background                         #1C1C1C
+button colour                      #2BC8B6
+button colour after hover          #71E2D4
+button text                        #1C1C1C
+banner backgorund                  #004C43
+banner border                      #016B5E
+banner text                        #2BC8B6
+text                               #FCFCFC
+grey text                          #BCBCBC
+
+yellow                             #FFBE47
+

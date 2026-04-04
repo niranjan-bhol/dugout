@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="view" id="mainView">
+      <p class="tagline">Create or join a <strong>dugout</strong> to discuss IPL matches live!</p>
+
+      <div class="status">
+        <span class="status-dot"></span>
+        <span id="statusText">Ready</span>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-primary" id="createRoomBtn">Create</button>
+        <button class="btn-secondary" id="joinRoomBtn">Join</button>
+      </div>
+    </div>
+
+    <div class="view hidden" id="createView">
+      <p class="tagline">Your dugout code</p>
+      <div class="room-code" id="generatedRoomId"></div>
+      <p class="limit-message hidden" id="createLimitMessage"></p>
+      <div class="button-group create-actions">
+        <button class="btn-secondary" id="copyRoomBtn">Copy</button>
+        <button class="btn-primary" id="backFromCreateBtn">Back</button>
+      </div>
+    </div>
+
+    <div class="view hidden" id="joinView">
+      <p class="tagline">Enter dugout code</p>
+      <input
+        type="text"
+        id="joinRoomInput"
+        class="room-input"
+        placeholder="word-word-word"
+        autocomplete="off"
+        spellcheck="false"
+      >
+      <div class="button-group join-actions">
+        <button class="btn-secondary" id="backFromJoinBtn">Back</button>
+        <button class="btn-primary" id="confirmJoinBtn">Join</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
