@@ -217,7 +217,26 @@ io.on('connection', (socket) => {
 
 // Start server
 const PORT = process.env.PORT || 3000;
+
+// Get local IP address for display
+function getLocalIP() {
+  const { networkInterfaces } = require('os');
+  const nets = networkInterfaces();
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      if (net.family === 'IPv4' && !net.internal) {
+        return net.address;
+      }
+    }
+  }
+  return 'localhost';
+}
+
 server.listen(PORT, '0.0.0.0', () => {
+  const localIP = getLocalIP();
   console.log(`\n🏏 Dugout Server running on port ${PORT}`);
-  console.log(`📡 ws://localhost:${PORT}\n`);
+  console.log(`📡 Local:   http://localhost:${PORT}`);
+  console.log(`📡 Network: http://${localIP}:${PORT}`);
+  console.log(`\n⚠️  Other devices must use: ${localIP}:${PORT}`);
+  console.log(`   Make sure all devices are on the SAME WiFi network!\n`);
 });

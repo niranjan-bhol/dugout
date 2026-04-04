@@ -67,11 +67,37 @@ function isValidRoomId(roomId) {
 // ===================
 
 /**
+ * Test if server is reachable
+ */
+async function testServerConnection() {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    
+    const res = await fetch(`${CONFIG.SIGNAL_SERVER}/`, { 
+      signal: controller.signal 
+    });
+    clearTimeout(timeout);
+    return res.ok;
+  } catch (err) {
+    console.error('Server unreachable:', err.message);
+    return false;
+  }
+}
+
+/**
  * Generate unique room ID by trying random word combinations
  * Server validates uniqueness (7-day cooldown)
  */
 async function generateRoomId() {
   if (wordlist.length === 0) return null;
+
+  // First test if server is reachable
+  const serverOk = await testServerConnection();
+  if (!serverOk) {
+    alert(`Cannot reach server at ${CONFIG.SIGNAL_SERVER}\n\nMake sure:\n1. Server is running on host machine\n2. Both devices are on same WiFi\n3. Check the IP address in popup.js`);
+    return null;
+  }
 
   for (let attempt = 0; attempt < 100; attempt++) {
     const words = Array.from({ length: 3 }, () => 
@@ -98,15 +124,22 @@ async function generateRoomId() {
 
 /**
  * Check if dugout exists on server
- * Returns { exists, expired, invalid }
+ * Returns { exists, expired, invalid, serverError }
  */
 async function checkDugoutStatus(roomId) {
   try {
-    const res = await fetch(`${CONFIG.SIGNAL_SERVER}/api/dugout/check/${encodeURIComponent(roomId)}`);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    
+    const res = await fetch(`${CONFIG.SIGNAL_SERVER}/api/dugout/check/${encodeURIComponent(roomId)}`, {
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    
     return res.ok ? await res.json() : { exists: false, expired: false, invalid: true };
   } catch (err) {
     console.error('Network error:', err);
-    return { exists: false, expired: false, invalid: true };
+    return { exists: false, expired: false, invalid: true, serverError: true };
   }
 }
 
@@ -473,6 +506,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     const status = await checkDugoutStatus(roomId);
+    
+    // Handle server unreachable
+    if (status.serverError) {
+      showError('joinErrorMessage', 'Server unreachable. Check network.');
+      alert(`Cannot reach server at ${CONFIG.SIGNAL_SERVER}\n\nMake sure:\n1. Server is running on host machine\n2. Both devices are on same WiFi`);
+      return;
+    }
+    
     if (status.exists) {
       hideError('joinErrorMessage');
       currentRoomId = roomId;
