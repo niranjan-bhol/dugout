@@ -9,6 +9,7 @@
     
     <!-- Main View: Create or Join -->
     <div class="view" id="mainView">
+      <button class="settings-btn" id="settingsBtn" title="Server Settings">⚙️</button>
       <p class="tagline">Create or join a <strong>dugout</strong> to discuss IPL matches live!</p>
       <div class="status">
         <span class="status-dot"></span>
@@ -17,6 +18,18 @@
       <div class="button-group">
         <button class="btn-primary" id="createRoomBtn">Create</button>
         <button class="btn-secondary" id="joinRoomBtn">Join</button>
+      </div>
+    </div>
+
+    <!-- Settings View -->
+    <div class="view hidden" id="settingsView">
+      <p class="tagline">Server Settings</p>
+      <p class="settings-hint">Enter the server URL (ngrok URL for public access)</p>
+      <input type="text" id="serverUrlInput" class="room-input" placeholder="https://xxxx.ngrok.io" autocomplete="off">
+      <p class="server-status" id="serverStatus"></p>
+      <div class="button-group">
+        <button class="btn-secondary" id="backFromSettingsBtn">Back</button>
+        <button class="btn-primary" id="saveServerBtn">Save</button>
       </div>
     </div>
 

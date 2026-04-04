@@ -2,6 +2,11 @@
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "socket.io": "^4.8.3"
+    "socket.io": "^4.8.3",
+    "@ngrok/ngrok": "^1.4.1"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "start:public": "ENABLE_NGROK=true node server.js"
   }
 }

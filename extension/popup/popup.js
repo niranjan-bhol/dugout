@@ -13,7 +13,7 @@
 // ===================
 
 const CONFIG = {
-  SIGNAL_SERVER: 'http://192.168.132.222:3000',
+  SIGNAL_SERVER: 'http://localhost:3000', // Default, will be overridden by stored value
   ICE_SERVERS: [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' }
@@ -22,6 +22,24 @@ const CONFIG = {
   CREATE_LIMIT_TEXT: 'You can create only one dugout per day. Copy & share with friends to join.',
   MIC_SETTINGS_URL: 'chrome://settings/content/siteDetails?site=chrome-extension%3A%2F%2Fiacmlinclegfmidcbmeccbecmjpealeg%2F'
 };
+
+/** Load saved server URL from storage */
+async function loadServerUrl() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['signalServer'], ({ signalServer }) => {
+      if (signalServer) {
+        CONFIG.SIGNAL_SERVER = signalServer;
+      }
+      resolve(CONFIG.SIGNAL_SERVER);
+    });
+  });
+}
+
+/** Save server URL to storage */
+function saveServerUrl(url) {
+  CONFIG.SIGNAL_SERVER = url;
+  chrome.storage.local.set({ signalServer: url });
+}
 
 // ===================
 // STATE
@@ -416,6 +434,7 @@ function toggleMute() {
 // ===================
 
 document.addEventListener('DOMContentLoaded', async function() {
+  await loadServerUrl();
   await loadWordlist();
 
   // DOM element references
@@ -438,7 +457,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     enableMicBtn: $('enableMicBtn'),
     nameInput: $('nameInput'),
     confirmNameBtn: $('confirmNameBtn'),
-    backFromNameBtn: $('backFromNameBtn')
+    backFromNameBtn: $('backFromNameBtn'),
+    settingsBtn: $('settingsBtn'),
+    serverUrlInput: $('serverUrlInput'),
+    serverStatus: $('serverStatus'),
+    saveServerBtn: $('saveServerBtn'),
+    backFromSettingsBtn: $('backFromSettingsBtn')
   };
 
   // Load saved username
@@ -448,6 +472,73 @@ document.addEventListener('DOMContentLoaded', async function() {
       elements.nameInput.value = saved;
     }
   });
+
+  // --- SETTINGS ---
+  if (elements.settingsBtn) {
+    elements.settingsBtn.addEventListener('click', () => {
+      console.log('Settings button clicked');
+      elements.serverUrlInput.value = CONFIG.SIGNAL_SERVER;
+      elements.serverStatus.textContent = '';
+      elements.serverStatus.className = 'server-status';
+      showView('settingsView');
+    });
+  } else {
+    console.error('Settings button not found!');
+  }
+
+  if (elements.backFromSettingsBtn) {
+    elements.backFromSettingsBtn.addEventListener('click', () => {
+      showView('mainView');
+    });
+  }
+
+  if (elements.saveServerBtn) {
+    elements.saveServerBtn.addEventListener('click', async () => {
+      let url = elements.serverUrlInput.value.trim();
+      if (!url) {
+        elements.serverStatus.textContent = 'Please enter a URL';
+        elements.serverStatus.className = 'server-status error';
+        return;
+      }
+
+      // Remove trailing slash
+      url = url.replace(/\/+$/, '');
+
+      // Validate URL format
+      try {
+        new URL(url);
+      } catch {
+        elements.serverStatus.textContent = 'Invalid URL format';
+        elements.serverStatus.className = 'server-status error';
+        return;
+      }
+
+      // Test connection
+      elements.serverStatus.textContent = 'Testing connection...';
+      elements.serverStatus.className = 'server-status';
+      
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+        
+        const res = await fetch(`${url}/`, { signal: controller.signal });
+        clearTimeout(timeout);
+        
+        if (res.ok) {
+          saveServerUrl(url);
+          elements.serverStatus.textContent = 'Connected! Settings saved.';
+          elements.serverStatus.className = 'server-status success';
+          setTimeout(() => showView('mainView'), 1000);
+        } else {
+          elements.serverStatus.textContent = 'Server not responding correctly';
+          elements.serverStatus.className = 'server-status error';
+        }
+      } catch (err) {
+        elements.serverStatus.textContent = 'Cannot connect to server';
+        elements.serverStatus.className = 'server-status error';
+      }
+    });
+  }
 
   // --- CREATE ROOM ---
   elements.createRoomBtn.addEventListener('click', async () => {

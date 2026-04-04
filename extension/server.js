@@ -217,6 +217,7 @@ io.on('connection', (socket) => {
 
 // Start server
 const PORT = process.env.PORT || 3000;
+const ENABLE_NGROK = process.env.ENABLE_NGROK === 'true';
 
 // Get local IP address for display
 function getLocalIP() {
@@ -232,11 +233,80 @@ function getLocalIP() {
   return 'localhost';
 }
 
-server.listen(PORT, '0.0.0.0', () => {
-  const localIP = getLocalIP();
-  console.log(`\n🏏 Dugout Server running on port ${PORT}`);
-  console.log(`📡 Local:   http://localhost:${PORT}`);
-  console.log(`📡 Network: http://${localIP}:${PORT}`);
-  console.log(`\n⚠️  Other devices must use: ${localIP}:${PORT}`);
-  console.log(`   Make sure all devices are on the SAME WiFi network!\n`);
+// Store public URL for API access
+let publicUrl = null;
+
+// API endpoint to get the current server URL
+app.get('/api/server-url', (req, res) => {
+  res.json({
+    local: `http://${getLocalIP()}:${PORT}`,
+    public: publicUrl
+  });
 });
+
+async function startServer() {
+  server.listen(PORT, '0.0.0.0', async () => {
+    const localIP = getLocalIP();
+    console.log(`\n🏏 Dugout Server running on port ${PORT}`);
+    console.log(`📡 Local:   http://localhost:${PORT}`);
+    console.log(`📡 Network: http://${localIP}:${PORT}`);
+
+    if (ENABLE_NGROK) {
+      try {
+        // Try to load auth token from config.json first, then environment variable
+        let authToken = process.env.NGROK_AUTHTOKEN;
+        
+        if (!authToken) {
+          try {
+            const configPath = path.join(__dirname, 'config.json');
+            if (fs.existsSync(configPath)) {
+              const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+              authToken = config.ngrokAuthToken;
+              if (authToken === 'PASTE_YOUR_NGROK_TOKEN_HERE') {
+                authToken = null;
+              }
+            }
+          } catch (configErr) {
+            console.log('   Could not read config.json');
+          }
+        }
+        
+        if (!authToken) {
+          throw new Error('No auth token found. Please edit config.json or set NGROK_AUTHTOKEN environment variable');
+        }
+        
+        const ngrok = require('@ngrok/ngrok');
+        
+        // Connect ngrok to the local server
+        const listener = await ngrok.forward({
+          addr: PORT,
+          authtoken: authToken
+        });
+        
+        publicUrl = listener.url();
+        console.log(`\n🌐 PUBLIC URL: ${publicUrl}`);
+        console.log(`   Share this URL with anyone to join from anywhere!`);
+        console.log(`\n📋 Update extension's CONFIG.SIGNAL_SERVER to:`);
+        console.log(`   '${publicUrl}'`);
+      } catch (err) {
+        console.error('\n❌ ngrok failed:', err.message);
+        console.log('\n📝 To fix this:');
+        console.log(`   1. Sign up at https://ngrok.com (free)`);
+        console.log(`   2. Get your auth token from: https://dashboard.ngrok.com/get-started/your-authtoken`);
+        console.log(`   3. Edit config.json and paste your token`);
+        console.log(`   4. Restart the server`);
+      }
+    } else {
+      console.log(`\n⚠️  Other devices must use: ${localIP}:${PORT}`);
+      console.log(`   Make sure all devices are on the SAME WiFi network!`);
+      console.log(`\n💡 To enable PUBLIC access (any network):`);
+      console.log(`   1. Sign up at https://ngrok.com (free)`);
+      console.log(`   2. Get your auth token from dashboard`);
+      console.log(`   3. Edit config.json and paste your token`);
+      console.log(`   4. Run: npm run start:public`);
+    }
+    console.log('');
+  });
+}
+
+startServer();
